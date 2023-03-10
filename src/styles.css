@@ -1,0 +1,87 @@
+:root {
+    --background-color: #FFFFFF;
+    --main-color: #00A7E1;
+    --additional-color: #00171F;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+    font-family: 'Golos Text', sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--additional-color);
+    font-size: 4rem;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 550px;
+}
+
+.welcome-button {
+    color: var(--background-color);
+    font-weight: 600;
+    border: 3px solid var(--additional-color);
+    background-color: var(--main-color);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+}
+
+.ships-container {
+    width: 300px;
+    height: 150px;
+    border: 3px solid var(--additional-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 30px;
+}
+
+.ship {
+    width: 30px;
+    background-color: var(--main-color);
+}
+
+.ship1 {
+    height: 30px;
+}
+
+.ship2 {
+    height: 60px;
+}
+
+.ship3 {
+    height: 90px;
+}
+
+.ship4 {
+    height: 120px;
+}
+
+.player-board {
+    display: flex;
+    flex-wrap: wrap;
+    width: 300px;
+    height: 300px;
+    border: 2px solid var(--additional-color);
+}
+
+.field {
+    width: 30px;
+    height: 30px;
+    box-sizing: border-box;
+    border: 1px solid #00171F;
+}
+
+
