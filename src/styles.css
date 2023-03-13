@@ -33,7 +33,13 @@ body {
     flex-direction: column;
 }
 
-.welcome-button {
+@media (max-width: 55em) {
+    .pregame-container {
+        zoom: 1.2;
+    }
+}
+
+.welcome-button, .rotate-button {
     color: var(--background-color);
     font-weight: 600;
     border: 3px solid var(--additional-color);
@@ -41,10 +47,13 @@ body {
     padding: 1rem 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0,.7);
-
 }
 
-.welcome-button:hover {
+.rotate-button {
+    scale: 0.75;
+}
+
+.welcome-button:hover, .rotate-button:hover{
     background-color: var(--additional-color);
 }
 
@@ -57,7 +66,13 @@ body {
 
 .pregame-container {
     flex-direction: column;
-    gap: 2rem;
+    justify-content: space-evenly;
+}
+
+.help-text {
+    font-size: 1.25rem;
+    text-decoration: underline;
+    text-decoration-color: var(--main-color)
 }
 
 .ships-container {
@@ -67,7 +82,7 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: flex-end;
-    padding: 10px;
+    padding-bottom: 10px;
 }
 
 .ship {
@@ -104,6 +119,11 @@ body {
     height: 20px;
     box-sizing: border-box;
     border: 1px solid #00171F;
+}
+
+.dragover {
+    background-color: var(--main-color);
+    opacity: 25%;
 }
 
 
