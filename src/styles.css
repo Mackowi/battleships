@@ -55,6 +55,7 @@ body {
 
 .welcome-button:hover, .rotate-button:hover{
     background-color: var(--additional-color);
+    color: var(--main-color);
 }
 
 .welcome-screen, .pregame-container{
