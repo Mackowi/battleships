@@ -77,34 +77,43 @@ body {
 }
 
 .ships-container {
-    width: 200px;
+    width: 300px;
     height: 100px;
     border: 3px solid var(--additional-color);
     display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    padding-bottom: 10px;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
 }
 
+
+
 .ship {
+    /* height: 20px; */
     width: 20px;
     background-color: var(--main-color);
+    cursor: move;
 }
 
 .ship1 {
-    height: 20px;
+    width: 20px;
+    /* height: 20px; */
 }
 
 .ship2 {
+    /* width: 40px; */
     height: 40px;
+
 }
 
 .ship3 {
+    /* width: 60px; */
     height: 60px;
+
 }
 
 .ship4 {
-    height: 80px;
+    width: 80px;
 }
 
 .player-board {

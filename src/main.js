@@ -4,10 +4,11 @@ const boardWidth = 10;
 const container = document.querySelector('.container');
 const startButton = document.querySelector('.welcome-button');
 
-startButton.addEventListener('click', (e) => {
-    clearWelcomeScreen();
-    createPregameScreen();
-})
+// startButton.addEventListener('click', (e) => {
+//     clearWelcomeScreen();
+//     createPregameScreen();
+// })
+
 
 const clearWelcomeScreen = () => {
     let welcomeScreen = document.querySelector('.welcome-screen');
@@ -77,7 +78,7 @@ const startShipPlacement = () => {
     fields.forEach(field => field.addEventListener('dragenter', (e) => {
         e.target.classList.add('dragover');
     }))
-    
+
     fields.forEach(field => field.addEventListener('dragleave', (e) => {
         setTimeout(() => {
             e.target.classList.remove('dragover');
@@ -96,5 +97,21 @@ const startShipPlacement = () => {
     let ships = Array.from(document.querySelectorAll('.ship'));
     ships.forEach(ship => ship.addEventListener('drag', (e) => {
         dragged = e.target;
+    })) 
+    ships.forEach(ship => ship.addEventListener('ondragstart', (e) => {
+        return false
     }))
+
+    let rotateButton = document.querySelector('.rotate-button')
+    rotateButton.addEventListener('click', (e) => {
+        rotateShips();
+    })
 }
+
+const rotateShips = () => {
+
+}
+
+
+clearWelcomeScreen();
+createPregameScreen();
