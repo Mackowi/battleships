@@ -4,10 +4,10 @@ const boardWidth = 10;
 const container = document.querySelector('.container');
 const startButton = document.querySelector('.welcome-button');
 
-// startButton.addEventListener('click', (e) => {
-//     clearWelcomeScreen();
-//     createPregameScreen();
-// })
+startButton.addEventListener('click', (e) => {
+    clearWelcomeScreen();
+    createPregameScreen();
+})
 
 
 const clearWelcomeScreen = () => {
@@ -30,7 +30,9 @@ const createPregameScreen = () => {
     for (let i = 1; i < 5; i++) {
         let ship = document.createElement('div');
         ship.classList.add('ship')
-        ship.classList.add(`ship${i}`)
+        ship.setAttribute('id', `${i}`)
+        ship.style.height = `${i*20}px`
+        ship.style.width = '20px'
         ship.draggable = true;
         if (i == 2) {
             shipsContainer.appendChild(ship);
@@ -108,10 +110,31 @@ const startShipPlacement = () => {
     })
 }
 
-const rotateShips = () => {
 
+let vertical = true;
+const rotateShips = () => {
+    let width;
+    let height;
+    let ships = Array.from(document.querySelectorAll('.ship'));
+    for (let i = 0; i < ships.length; i++) {
+        if (vertical) {
+            width = ships[i].id * 20;
+            ships[i].style.width = `${width}px`;
+            ships[i].style.height = '20px';
+            if (i+1 == ships.length) {
+                vertical = false;
+            }
+        } else {
+            height = ships[i].id * 20;
+            ships[i].style.height = `${height}px`;
+            ships[i].style.width = '20px';
+            if (i+1 == ships.length) {
+                vertical = true;
+            }
+        }
+    }
 }
 
 
-clearWelcomeScreen();
-createPregameScreen();
+// clearWelcomeScreen();
+// createPregameScreen();

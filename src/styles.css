@@ -86,35 +86,11 @@ body {
     align-items: center;
 }
 
-
-
 .ship {
-    /* height: 20px; */
-    width: 20px;
     background-color: var(--main-color);
     cursor: move;
 }
 
-.ship1 {
-    width: 20px;
-    /* height: 20px; */
-}
-
-.ship2 {
-    /* width: 40px; */
-    height: 40px;
-
-}
-
-.ship3 {
-    /* width: 60px; */
-    height: 60px;
-
-}
-
-.ship4 {
-    width: 80px;
-}
 
 .player-board {
     display: flex;
