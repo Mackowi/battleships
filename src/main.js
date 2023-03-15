@@ -4,6 +4,7 @@ const boardWidth = 10;
 const container = document.querySelector('.container');
 const startButton = document.querySelector('.welcome-button');
 let vertical = true;
+let dragged;
 
 
 startButton.addEventListener('click', () => {
@@ -30,10 +31,10 @@ const createPregameScreen = () => {
     
     for (let i = 1; i < 5; i++) {
         let ship = document.createElement('div');
-        ship.classList.add('ship')
-        ship.setAttribute('id', `${i}`)
-        ship.style.height = `${i*20}px`
-        ship.style.width = '20px'
+        ship.classList.add('ship');
+        ship.setAttribute('id', `${i}`);
+        ship.style.height = `${i*20}px`;
+        ship.style.width = '20px';
         ship.draggable = true;
         if (i == 2) {
             shipsContainer.appendChild(ship);
@@ -46,7 +47,7 @@ const createPregameScreen = () => {
 
     let rotateButton = document.createElement('button');
     rotateButton.classList = 'rotate-button';
-    rotateButton.innerText = 'ROTATE'
+    rotateButton.innerText = 'ROTATE';
 
     let playerBoard = document.createElement('div');
     playerBoard.classList = 'player-board';
@@ -54,22 +55,21 @@ const createPregameScreen = () => {
     for (let i = 0; i < boardWidth * boardWidth; i++) {
         let field = document.createElement('div');
         field.classList = 'field';
-        field.setAttribute('id', `${i}`)
+        field.setAttribute('id', `${i}`);
         playerBoard.appendChild(field);
     }
     
-    pregameContainer.appendChild(helpText)
-    pregameContainer.appendChild(shipsContainer)
-    pregameContainer.appendChild(rotateButton)
-    pregameContainer.appendChild(playerBoard)
+    pregameContainer.appendChild(helpText);
+    pregameContainer.appendChild(shipsContainer);
+    pregameContainer.appendChild(rotateButton);
+    pregameContainer.appendChild(playerBoard);
     container.appendChild(pregameContainer);
     startShipPlacement();
 }
 
 
 const startShipPlacement = () => {
-    let dragged;
-    let fields = Array.from(document.querySelectorAll('.field'))
+    let fields = Array.from(document.querySelectorAll('.field'));
 
     fields.forEach(field => field.addEventListener("dragover", (e) => {
           // prevent default to allow drop
@@ -79,19 +79,19 @@ const startShipPlacement = () => {
       ));
 
     fields.forEach(field => field.addEventListener('dragenter', (e) => {
-        e.target.classList.add('dragover');
+        findAndMark(e, fields)
     }))
 
     fields.forEach(field => field.addEventListener('dragleave', (e) => {
         setTimeout(() => {
-            e.target.classList.remove('dragover');
+            findAndMark(e, fields)
         }, 100);
     }))
     
     fields.forEach(field => field.addEventListener('drop', (e) => {
-
         e.preventDefault();
-        e.target.classList.remove('dragover');
+        findAndMark(e, fields)
+        findAndPlace(e, fields)
         // we give length of ship and placement for check if correct place
         placePlayerShip(dragged.id, e.target);
         dragged.remove();
@@ -110,18 +110,59 @@ const startShipPlacement = () => {
     })) 
 
 
-    let rotateButton = document.querySelector('.rotate-button')
+    let rotateButton = document.querySelector('.rotate-button');
     rotateButton.addEventListener('click', (e) => {
         rotateShips();
-        console.log(vertical);
+        console.log('vertical '+vertical);
     })
 }
 
+const findAndMark = (e, fields) => {
+    let fieldId = e.target.id;
+    let shipLength = dragged.id;
+    let markFields = [];
+    if (vertical) {
+        for (let i = 0; i < shipLength; i++) {
+            let nextFieldId = Number(fieldId) + 10*i;
+            markFields.push(nextFieldId);
+        }
+    } else {
+        for (let i = 0; i < shipLength; i++) {
+            let nextFieldId = Number(fieldId) + 1*i;
+            markFields.push(nextFieldId);
+        }
+    }
+    markFields.forEach(markField => {
+        let field = fields[markField]
+        field.classList.toggle('dragover');
+    });
+}
+
+const findAndPlace = (e, fields) => {
+    let fieldId = e.target.id;
+    let shipLength = dragged.id;
+    let markFields = [];
+    if (vertical) {
+        for (let i = 0; i < shipLength; i++) {
+            let nextFieldId = Number(fieldId) + 10*i;
+            markFields.push(nextFieldId);
+        }
+    } else {
+        for (let i = 0; i < shipLength; i++) {
+            let nextFieldId = Number(fieldId) + 1*i;
+            markFields.push(nextFieldId);
+        }
+    }
+    markFields.forEach(markField => {
+        let field = fields[markField]
+        field.classList.add('ship');
+    });
+}
 
 const rotateShips = () => {
     let width;
     let height;
-    let ships = Array.from(document.querySelectorAll('.ship'));
+    let ships = Array.from(document.querySelectorAll('.ships-container > .ship'));
     for (let i = 0; i < ships.length; i++) {
         if (vertical) {
             width = ships[i].id * 20;
@@ -169,5 +210,6 @@ const checkPlacement = (field) => {
 }
 
 const finishPreGame = () => {
-    console.log('finish pregame')
+    let shipsContainer = document.querySelector('.ships-container');
+    shipsContainer.remove()
 }
