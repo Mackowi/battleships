@@ -3,8 +3,10 @@ import './styles.css'
 const boardWidth = 10;
 const container = document.querySelector('.container');
 const startButton = document.querySelector('.welcome-button');
+let vertical = true;
 
-startButton.addEventListener('click', (e) => {
+
+startButton.addEventListener('click', () => {
     clearWelcomeScreen();
     createPregameScreen();
 })
@@ -16,7 +18,6 @@ const clearWelcomeScreen = () => {
 }
 
 const createPregameScreen = () => {
-
     let pregameContainer = document.createElement('div');
     pregameContainer.classList = 'pregame-container';
 
@@ -88,11 +89,18 @@ const startShipPlacement = () => {
     }))
     
     fields.forEach(field => field.addEventListener('drop', (e) => {
+
         e.preventDefault();
         e.target.classList.remove('dragover');
+        // we give length of ship and placement for check if correct place
+        placePlayerShip(dragged.id, e.target);
+        dragged.remove();
         e.target.classList.add('ship');
-        e.target.classList.add('ship1');
-        console.log(field);
+        // check initial ships if we can start next phase
+        let shipsToPlace = Array.from(document.querySelectorAll('.ships-container > .ship'));
+        if (!shipsToPlace.length) {
+            finishPreGame();
+        }
     }))
 
 
@@ -100,18 +108,16 @@ const startShipPlacement = () => {
     ships.forEach(ship => ship.addEventListener('drag', (e) => {
         dragged = e.target;
     })) 
-    ships.forEach(ship => ship.addEventListener('ondragstart', (e) => {
-        return false
-    }))
+
 
     let rotateButton = document.querySelector('.rotate-button')
     rotateButton.addEventListener('click', (e) => {
         rotateShips();
+        console.log(vertical);
     })
 }
 
 
-let vertical = true;
 const rotateShips = () => {
     let width;
     let height;
@@ -135,6 +141,33 @@ const rotateShips = () => {
     }
 }
 
+class Ship {
+    constructor(length) {
+        this.length = length;
+        this.hits = 0;
+        this.hit = () => {
+            this.hits += 1;
+        };
+        this.isSunk = () => {
+            return this.hits == this.length ? true : false;
+        };
+    }
+}
 
-// clearWelcomeScreen();
-// createPregameScreen();
+
+const placePlayerShip = (shipLength, target) => {
+    if (checkPlacement(target.id)) {
+        let ship = new Ship(shipLength);
+        console.log(ship);
+    } else {
+        console.log('wrong placement');
+    }
+}
+
+const checkPlacement = (field) => {
+    // to do check if field is right one for placing ship
+}
+
+const finishPreGame = () => {
+    console.log('finish pregame')
+}
