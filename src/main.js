@@ -12,7 +12,6 @@ startButton.addEventListener('click', () => {
     createPregameScreen();
 })
 
-
 const clearWelcomeScreen = () => {
     let welcomeScreen = document.querySelector('.welcome-screen');
     welcomeScreen.remove();
@@ -67,7 +66,6 @@ const createPregameScreen = () => {
     startShipPlacement();
 }
 
-
 const startShipPlacement = () => {
     let fields = Array.from(document.querySelectorAll('.field'));
 
@@ -90,12 +88,11 @@ const startShipPlacement = () => {
     
     fields.forEach(field => field.addEventListener('drop', (e) => {
         e.preventDefault();
-        findAndMark(e, fields)
-        findAndPlace(e, fields)
-        // we give length of ship and placement for check if correct place
-        placePlayerShip(dragged.id, e.target);
-        dragged.remove();
-        e.target.classList.add('ship');
+        findAndMark(e, fields);
+        let correct = findAndMark(e, fields, true);
+        if (correct) {
+            dragged.remove();
+        }
         // check initial ships if we can start next phase
         let shipsToPlace = Array.from(document.querySelectorAll('.ships-container > .ship'));
         if (!shipsToPlace.length) {
@@ -117,7 +114,7 @@ const startShipPlacement = () => {
     })
 }
 
-const findAndMark = (e, fields) => {
+const findAndMark = (e, fields, drop = false) => {
     let fieldId = e.target.id;
     let shipLength = dragged.id;
     let markFields = [];
@@ -132,31 +129,16 @@ const findAndMark = (e, fields) => {
             markFields.push(nextFieldId);
         }
     }
+    let correctPlacement = checkPlacement(markFields, shipLength);
+    console.log('correct placemenet '+ correctPlacement)
+    if (!correctPlacement) {
+        return false;
+    } 
     markFields.forEach(markField => {
-        let field = fields[markField]
-        field.classList.toggle('dragover');
+            let field = fields[markField]
+            drop == true ? field.classList.add('ship') : field.classList.toggle('dragover');
     });
-}
-
-const findAndPlace = (e, fields) => {
-    let fieldId = e.target.id;
-    let shipLength = dragged.id;
-    let markFields = [];
-    if (vertical) {
-        for (let i = 0; i < shipLength; i++) {
-            let nextFieldId = Number(fieldId) + 10*i;
-            markFields.push(nextFieldId);
-        }
-    } else {
-        for (let i = 0; i < shipLength; i++) {
-            let nextFieldId = Number(fieldId) + 1*i;
-            markFields.push(nextFieldId);
-        }
-    }
-    markFields.forEach(markField => {
-        let field = fields[markField]
-        field.classList.add('ship');
-    });
+    return true;
 }
 
 const rotateShips = () => {
@@ -199,17 +181,47 @@ class Ship {
 const placePlayerShip = (shipLength, target) => {
     if (checkPlacement(target.id)) {
         let ship = new Ship(shipLength);
-        console.log(ship);
     } else {
         console.log('wrong placement');
     }
 }
 
-const checkPlacement = (field) => {
-    // to do check if field is right one for placing ship
+const checkPlacement = (fieldsId, shipLength) => {
+    if (!fieldsId.every((fieldId) => fieldId < 100)) {
+        return false
+    } 
+    // check for horizontal ships, if fieldId divided by 10 gives 0 in division remainder
+    // it means we're crossing the edge of board
+    if (!vertical) {
+        if (fieldsId[0] == 0) {
+            return true;
+        }
+        else
+         if (!fieldsId.every((fieldId) => fieldId % 10 != 0)) {
+            return false
+        }
+    }
+    let playerBoard = document.querySelector('.player-board');
+    let fields = Array.from(playerBoard.querySelectorAll('.ship'));
+    if (!fields.length) {
+        return true
+    } else {
+        let fieldNotBusy = true;
+        fieldsId.forEach(fieldId => {
+            if (fields.find((field) => field.id == fieldId)) {
+                fieldNotBusy = false;
+            } 
+        });
+        if (!fieldNotBusy) {
+            console.log('FIELD BUSY')
+            return false;
+        }
+    }
+    return true;
 }
 
 const finishPreGame = () => {
     let shipsContainer = document.querySelector('.ships-container');
     shipsContainer.remove()
 }
+
