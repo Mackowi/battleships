@@ -33,12 +33,6 @@ body {
     flex-direction: column;
 }
 
-@media (max-width: 55em) {
-    .pregame-container {
-        zoom: 1.2;
-    }
-}
-
 .welcome-button, .rotate-button {
     color: var(--background-color);
     font-weight: 600;
@@ -58,16 +52,26 @@ body {
     color: var(--main-color);
 }
 
-.welcome-screen, .pregame-container{
+.welcome-screen, .game-container{
     flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.pregame-container {
+.game-container {
     flex-direction: column;
     justify-content: space-evenly;
+}
+
+.orientation  {
+    flex-direction: row;
+}
+
+@media (max-width: 55em) {
+    .orientation {
+        flex-direction: column;
+    }  
 }
 
 .help-text {
@@ -92,7 +96,7 @@ body {
 }
 
 
-.player-board {
+.board {
     display: flex;
     flex-wrap: wrap;
     width: 200px;

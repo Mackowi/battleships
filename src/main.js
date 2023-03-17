@@ -18,8 +18,8 @@ const clearWelcomeScreen = () => {
 }
 
 const createPregameScreen = () => {
-    let pregameContainer = document.createElement('div');
-    pregameContainer.classList = 'pregame-container';
+    let gameContainer = document.createElement('div');
+    gameContainer.classList = 'game-container';
 
     let helpText = document.createElement('div');
     helpText.classList = 'help-text';
@@ -48,25 +48,26 @@ const createPregameScreen = () => {
     rotateButton.classList = 'rotate-button';
     rotateButton.innerText = 'ROTATE';
 
-    let playerBoard = document.createElement('div');
-    playerBoard.classList = 'player-board';
+    let board = document.createElement('div');
+    board.classList = 'board';
+    board.setAttribute('id', 'playerBoard');
     
     for (let i = 0; i < boardWidth * boardWidth; i++) {
         let field = document.createElement('div');
         field.classList = 'field';
         field.setAttribute('id', `${i}`);
-        playerBoard.appendChild(field);
+        board.appendChild(field);
     }
     
-    pregameContainer.appendChild(helpText);
-    pregameContainer.appendChild(shipsContainer);
-    pregameContainer.appendChild(rotateButton);
-    pregameContainer.appendChild(playerBoard);
-    container.appendChild(pregameContainer);
-    startShipPlacement();
+    gameContainer.appendChild(helpText);
+    gameContainer.appendChild(shipsContainer);
+    gameContainer.appendChild(rotateButton);
+    gameContainer.appendChild(board);
+    container.appendChild(gameContainer);
+    startShipsPlacement();
 }
 
-const startShipPlacement = () => {
+const startShipsPlacement = () => {
     let fields = Array.from(document.querySelectorAll('.field'));
 
     fields.forEach(field => field.addEventListener("dragover", (e) => {
@@ -92,6 +93,7 @@ const startShipPlacement = () => {
         let correct = findAndMark(e, fields, true);
         if (correct) {
             dragged.remove();
+            placeShip(dragged.id)
         }
         // check initial ships if we can start next phase
         let shipsToPlace = Array.from(document.querySelectorAll('.ships-container > .ship'));
@@ -110,7 +112,7 @@ const startShipPlacement = () => {
     let rotateButton = document.querySelector('.rotate-button');
     rotateButton.addEventListener('click', (e) => {
         rotateShips();
-        console.log('vertical '+vertical);
+        // console.log('vertical '+vertical);
     })
 }
 
@@ -129,8 +131,8 @@ const findAndMark = (e, fields, drop = false) => {
             markFields.push(nextFieldId);
         }
     }
-    let correctPlacement = checkPlacement(markFields, shipLength);
-    console.log('correct placemenet '+ correctPlacement)
+    let correctPlacement = checkPlacement(markFields);
+    // console.log('correct placemenet '+ correctPlacement)
     if (!correctPlacement) {
         return false;
     } 
@@ -164,6 +166,9 @@ const rotateShips = () => {
     }
 }
 
+let playerShips = [];
+let computerShips = [];
+
 class Ship {
     constructor(length) {
         this.length = length;
@@ -177,16 +182,16 @@ class Ship {
     }
 }
 
-
-const placePlayerShip = (shipLength, target) => {
-    if (checkPlacement(target.id)) {
-        let ship = new Ship(shipLength);
+const placeShip = (shipLength, player = true) => {
+    let ship = new Ship(shipLength);
+    if (player) {
+        playerShips.push(ship);
     } else {
-        console.log('wrong placement');
+        computerShips.push(ship);
     }
 }
 
-const checkPlacement = (fieldsId, shipLength) => {
+const checkPlacement = (fieldsId, player = true) => {
     if (!fieldsId.every((fieldId) => fieldId < 100)) {
         return false
     } 
@@ -201,8 +206,13 @@ const checkPlacement = (fieldsId, shipLength) => {
             return false
         }
     }
-    let playerBoard = document.querySelector('.player-board');
-    let fields = Array.from(playerBoard.querySelectorAll('.ship'));
+    let board;
+    if (player) {
+        board = document.getElementById('playerBoard')
+    } else {
+        board = document.getElementById('computerBoard');
+    }
+    let fields = Array.from(board.querySelectorAll('.ship'));
     if (!fields.length) {
         return true
     } else {
@@ -213,7 +223,6 @@ const checkPlacement = (fieldsId, shipLength) => {
             } 
         });
         if (!fieldNotBusy) {
-            console.log('FIELD BUSY')
             return false;
         }
     }
@@ -222,6 +231,74 @@ const checkPlacement = (fieldsId, shipLength) => {
 
 const finishPreGame = () => {
     let shipsContainer = document.querySelector('.ships-container');
+    let helpText = document.querySelector('.help-text')
+    let rotateButton = document.querySelector('.rotate-button')
     shipsContainer.remove()
+    helpText.remove()
+    rotateButton.remove()
+    createComputerBoard();
+    createComputerShips();
+    placeComputerShips();
 }
 
+const createComputerBoard = () => {
+    let gameContainer = document.querySelector('.game-container');
+
+    let computerBoard = document.createElement('div');
+    computerBoard.classList = 'board';
+    computerBoard.setAttribute('id', 'computerBoard');
+    
+    for (let i = 0; i < boardWidth * boardWidth; i++) {
+        let field = document.createElement('div');
+        field.classList = 'field';
+        field.setAttribute('id', `${i}`);
+        computerBoard.appendChild(field);
+    }
+    gameContainer.classList.add('orientation');
+    gameContainer.append(computerBoard);
+}
+
+const createComputerShips = () => {
+    for (let i = 1; i < 5; i++) {
+        if (i == 2) {
+            placeShip(false, i);
+            placeShip(false, i);
+        } else {
+            placeShip(false, i);
+        }
+    }
+}
+
+const placeComputerShips = () => {
+    for (let i = 1; i < 5; i++) {
+        let randomVertical = Math.random() < 0.5;
+        let startField = Math.floor(Math.random() * 100);
+        console.log('startField '+startField);
+        console.log('i '+ i);
+        if (i == 2) {
+            calcShipFields(startField, i, randomVertical);
+            calcShipFields(startField, i, randomVertical);
+        } else {
+            calcShipFields(startField, i, randomVertical);
+        }
+    }
+}
+
+const calcShipFields = (startField, i, vertical) => {
+    let fields = [];
+    if (vertical) {
+        for (let j = 0; j < i; j++) {
+            let nextFieldId = startField + 10*j;
+            fields.push(nextFieldId);
+        }
+    } else {
+        for (let j = 0; j < i; j++) {
+            let nextFieldId = startField + 1*j;
+            fields.push(nextFieldId);
+        }
+    }
+    let correctPlacement = checkPlacement(fields, false);
+    console.log('correct placemenet '+ correctPlacement)
+    console.log('fields');
+    console.log(fields);
+}
