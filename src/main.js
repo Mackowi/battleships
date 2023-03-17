@@ -31,6 +31,7 @@ const createPregameScreen = () => {
     for (let i = 1; i < 5; i++) {
         let ship = document.createElement('div');
         ship.classList.add('ship');
+        ship.classList.add('movable');
         ship.setAttribute('id', `${i}`);
         ship.style.height = `${i*20}px`;
         ship.style.width = '20px';
@@ -138,7 +139,12 @@ const findAndMark = (e, fields, drop = false) => {
     } 
     markFields.forEach(markField => {
             let field = fields[markField]
-            drop == true ? field.classList.add('ship') : field.classList.toggle('dragover');
+            if (drop) {
+                field.classList.add('ship')
+                field.classList.remove('movable')
+            } else {
+                field.classList.toggle('dragover');
+            }
     });
     return true;
 }
@@ -275,13 +281,23 @@ const placeComputerShips = () => {
         let startField = Math.floor(Math.random() * 100);
         console.log('startField '+startField);
         console.log('i '+ i);
+        let shipCords = calcShipFields(startField, i, randomVertical);
+        shipCords.forEach(shipCord => {
+            let board = document.querySelector('#computerBoard');
+            let field = board.getElementsByTagName('div')[shipCord];
+            field.classList.add('ship');
+        });
         if (i == 2) {
-            calcShipFields(startField, i, randomVertical);
-            calcShipFields(startField, i, randomVertical);
-        } else {
-            calcShipFields(startField, i, randomVertical);
-        }
+            startField = Math.floor(Math.random() * 100);
+            shipCords = calcShipFields(startField, i, randomVertical);
+            shipCords.forEach(shipCord => {
+                let board = document.querySelector('#computerBoard');
+                let field = board.getElementsByTagName('div')[shipCord];
+                field.classList.add('ship');
+            });
+        } 
     }
+
 }
 
 const calcShipFields = (startField, i, vertical) => {
@@ -301,4 +317,9 @@ const calcShipFields = (startField, i, vertical) => {
     console.log('correct placemenet '+ correctPlacement)
     console.log('fields');
     console.log(fields);
+    if (!correctPlacement) {
+        let startField = Math.floor(Math.random() * 100);
+        calcShipFields(startField, i, vertical)
+    }
+    return fields
 }

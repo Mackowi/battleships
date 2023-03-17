@@ -92,6 +92,9 @@ body {
 
 .ship {
     background-color: var(--main-color);
+}
+
+.movable {
     cursor: move;
 }
 
