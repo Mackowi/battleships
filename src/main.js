@@ -133,7 +133,7 @@ const findAndMark = (e, fields, drop = false) => {
         }
     }
     let correctPlacement = checkPlacement(markFields);
-    // console.log('correct placemenet '+ correctPlacement)
+    console.log('correct placemenet here'+ correctPlacement)
     if (!correctPlacement) {
         return false;
     } 
@@ -201,17 +201,23 @@ const checkPlacement = (fieldsId, player = true) => {
     if (!fieldsId.every((fieldId) => fieldId < 100)) {
         return false
     } 
-    // check for horizontal ships, if fieldId divided by 10 gives 0 in division remainder
-    // it means we're crossing the edge of board
-    if (!vertical) {
-        if (fieldsId[0] == 0) {
-            return true;
-        }
-        else
-         if (!fieldsId.every((fieldId) => fieldId % 10 != 0)) {
-            return false
-        }
+    if (fieldsId[0] == 0) {
+        return true;
     }
+    if (!vertical) {
+        // check for horizontal ships, if fieldId divided by 10 gives 0 in division remainder
+        // it means we're crossing the edge of board
+        let firstField = true;
+        for (let i = 0; i < fieldsId.length; i++) {
+            if (i == 0) {
+                firstField = false;
+                continue;
+            }
+            if (fieldsId[i] % 10 == 0 && !firstField) {
+                return false 
+            }
+        }
+    } 
     let board;
     if (player) {
         board = document.getElementById('playerBoard')
@@ -245,6 +251,7 @@ const finishPreGame = () => {
     createComputerBoard();
     createComputerShips();
     placeComputerShips();
+    startGame();
 }
 
 const createComputerBoard = () => {
@@ -267,10 +274,10 @@ const createComputerBoard = () => {
 const createComputerShips = () => {
     for (let i = 1; i < 5; i++) {
         if (i == 2) {
-            placeShip(false, i);
-            placeShip(false, i);
+            placeShip(i, false);
+            placeShip(i, false);
         } else {
-            placeShip(false, i);
+            placeShip(i, false);
         }
     }
 }
@@ -279,13 +286,13 @@ const placeComputerShips = () => {
     for (let i = 1; i < 5; i++) {
         let randomVertical = Math.random() < 0.5;
         let startField = Math.floor(Math.random() * 100);
-        console.log('startField '+startField);
-        console.log('i '+ i);
+        console.log('startField: ' + startField + ' i: '+ i);
         let shipCords = calcShipFields(startField, i, randomVertical);
         shipCords.forEach(shipCord => {
             let board = document.querySelector('#computerBoard');
             let field = board.getElementsByTagName('div')[shipCord];
-            field.classList.add('ship');
+            field.classList.add(`ship${i}`);
+            field.classList.add(`ship`);
         });
         if (i == 2) {
             startField = Math.floor(Math.random() * 100);
@@ -293,11 +300,11 @@ const placeComputerShips = () => {
             shipCords.forEach(shipCord => {
                 let board = document.querySelector('#computerBoard');
                 let field = board.getElementsByTagName('div')[shipCord];
-                field.classList.add('ship');
+                field.classList.add(`ship${i}`);
+                field.classList.add(`ship`);
             });
         } 
     }
-
 }
 
 const calcShipFields = (startField, i, vertical) => {
@@ -315,11 +322,36 @@ const calcShipFields = (startField, i, vertical) => {
     }
     let correctPlacement = checkPlacement(fields, false);
     console.log('correct placemenet '+ correctPlacement)
-    console.log('fields');
     console.log(fields);
     if (!correctPlacement) {
         let startField = Math.floor(Math.random() * 100);
-        calcShipFields(startField, i, vertical)
+        fields = calcShipFields(startField, i, vertical)
+        return fields 
     }
     return fields
+}
+
+const startGame = () => {
+    console.log(computerShips);
+    const regex = /ship(\d)/;
+    const computerFields = Array.from(document.querySelectorAll('#computerBoard > .field'));
+    let shipId; 
+    computerFields.forEach(computerField => {
+        computerField.addEventListener('click', (e) => {
+            for (let i = 0; i < e.target.classList.length; i++) {
+                if (regex.test(e.target.classList[i])) {
+                    shipId = e.target.classList[i].match(regex)[1];
+                    console.log('shipId '+ shipId);
+                    computerShips.forEach(ship => {
+                        if (ship.length == shipId) {
+                            ship.hit();
+                            console.log('SUNKED?');
+                            console.log(ship.isSunk());
+                        }
+                    });
+                }
+            }
+        }) 
+    });
+
 }

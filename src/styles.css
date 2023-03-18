@@ -15,7 +15,6 @@ body {
   height: 100%;
 }
 
-
 .header {
     display: flex;
     justify-content: center;
@@ -118,5 +117,7 @@ body {
     background-color: var(--main-color);
     opacity: 25%;
 }
+
+
 
 
