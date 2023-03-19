@@ -5,7 +5,7 @@ const container = document.querySelector('.container');
 const startButton = document.querySelector('.welcome-button');
 let vertical = true;
 let dragged;
-
+const regex = /ship(\d)/;
 
 startButton.addEventListener('click', () => {
     clearWelcomeScreen();
@@ -36,13 +36,7 @@ const createPregameScreen = () => {
         ship.style.height = `${i*20}px`;
         ship.style.width = '20px';
         ship.draggable = true;
-        if (i == 2) {
-            shipsContainer.appendChild(ship);
-            // cloneNode needed to add 2nd time #2 ship
-            shipsContainer.appendChild(ship.cloneNode(true));
-        } else {
-            shipsContainer.appendChild(ship);
-        }
+        shipsContainer.appendChild(ship);
     }
 
     let rotateButton = document.createElement('button');
@@ -133,15 +127,16 @@ const findAndMark = (e, fields, drop = false) => {
         }
     }
     let correctPlacement = checkPlacement(markFields);
-    console.log('correct placemenet here'+ correctPlacement)
+    // console.log('correct placemenet here'+ correctPlacement)
     if (!correctPlacement) {
         return false;
     } 
     markFields.forEach(markField => {
             let field = fields[markField]
             if (drop) {
-                field.classList.add('ship')
-                field.classList.remove('movable')
+                field.classList.add('ship');
+                field.classList.add(`ship${shipLength}`);
+                field.classList.remove('movable');
             } else {
                 field.classList.toggle('dragover');
             }
@@ -273,12 +268,7 @@ const createComputerBoard = () => {
 
 const createComputerShips = () => {
     for (let i = 1; i < 5; i++) {
-        if (i == 2) {
-            placeShip(i, false);
-            placeShip(i, false);
-        } else {
-            placeShip(i, false);
-        }
+        placeShip(i, false);
     }
 }
 
@@ -292,18 +282,7 @@ const placeComputerShips = () => {
             let board = document.querySelector('#computerBoard');
             let field = board.getElementsByTagName('div')[shipCord];
             field.classList.add(`ship${i}`);
-            field.classList.add(`ship`);
         });
-        if (i == 2) {
-            startField = Math.floor(Math.random() * 100);
-            shipCords = calcShipFields(startField, i, randomVertical);
-            shipCords.forEach(shipCord => {
-                let board = document.querySelector('#computerBoard');
-                let field = board.getElementsByTagName('div')[shipCord];
-                field.classList.add(`ship${i}`);
-                field.classList.add(`ship`);
-            });
-        } 
     }
 }
 
@@ -321,8 +300,8 @@ const calcShipFields = (startField, i, vertical) => {
         }
     }
     let correctPlacement = checkPlacement(fields, false);
-    console.log('correct placemenet '+ correctPlacement)
-    console.log(fields);
+    // console.log('correct placemenet '+ correctPlacement)
+    // console.log(fields);
     if (!correctPlacement) {
         let startField = Math.floor(Math.random() * 100);
         fields = calcShipFields(startField, i, vertical)
@@ -332,26 +311,96 @@ const calcShipFields = (startField, i, vertical) => {
 }
 
 const startGame = () => {
-    console.log(computerShips);
-    const regex = /ship(\d)/;
     const computerFields = Array.from(document.querySelectorAll('#computerBoard > .field'));
-    let shipId; 
     computerFields.forEach(computerField => {
-        computerField.addEventListener('click', (e) => {
-            for (let i = 0; i < e.target.classList.length; i++) {
-                if (regex.test(e.target.classList[i])) {
-                    shipId = e.target.classList[i].match(regex)[1];
-                    console.log('shipId '+ shipId);
-                    computerShips.forEach(ship => {
-                        if (ship.length == shipId) {
-                            ship.hit();
-                            console.log('SUNKED?');
-                            console.log(ship.isSunk());
-                        }
-                    });
-                }
+        computerField.addEventListener('mouseenter', (e) => {
+            if (!e.target.classList.contains('miss') && !e.target.classList.contains('hit')) {
+                e.target.classList.add('hover');
             }
+        })
+        computerField.addEventListener('mouseleave', (e) => {
+            e.target.classList.remove('hover');
         }) 
+        computerField.addEventListener('click', (e) => {
+            if (e.target.classList.contains('miss') || e.target.classList.contains('hit')) {
+                return;
+            }
+            e.target.classList.remove('hover');
+            playerHit(e, computerField);
+            computerHit();
+            if (computerShips.every((ship) => ship.isSunk())) {
+                console.log('Player Won!');
+                showWinner('Player');
+            } else if (playerShips.every((ship) => ship.isSunk())) {
+                console.log('Computer Won!');
+                showWinner('Computer');
+            }
+        }); 
     });
+}
 
+const playerHit = (e, computerField) => {
+    let hit = false;
+    for (let i = 0; i < e.target.classList.length; i++) {
+        if (regex.test(e.target.classList[i])) {
+            let shipId = e.target.classList[i].match(regex)[1];
+            hit = true;
+            computerShips.forEach(ship => {
+                if (ship.length == shipId) {
+                    ship.hit();
+                    console.log(ship.isSunk())
+                }
+            });
+        }
+    }
+    hit == true ? computerField.classList.add('hit') : computerField.classList.add('miss');
+}
+
+const computerHit = () => {
+    let hit = false;
+    let playerFields = Array.from(document.querySelectorAll('#playerBoard > .field'));
+    let randomField = Math.floor(Math.random() * 100);
+    playerFields.forEach(playerField => {
+        if (playerField.id == randomField) {
+            if (playerField.classList.contains('miss')) {
+                computerHit();
+            } else if (playerField.classList.contains('hit')) {
+                computerHit();
+            } else {
+                for (let i = 0; i < playerField.classList.length; i++) {
+                    if (regex.test(playerField.classList[i])) {
+                        let shipId = playerField.classList[i].match(regex)[1];
+                        hit = true;
+                        playerShips.forEach(ship => {
+                            if (ship.length == shipId) {
+                                ship.hit();
+                                console.log(ship.isSunk())
+                            }
+                        });
+                    }
+                }
+                hit == true ? playerField.classList.add('hit') : playerField.classList.add('miss');
+            }
+        }
+    });
+}
+
+const showWinner = (winner) => {
+    let gameContainer = document.querySelector('.game-container');
+    gameContainer.classList.remove('orientation');
+    while (gameContainer.firstChild) {
+        gameContainer.removeChild(gameContainer.lastChild)
+    }
+    let winnerMsg = document.createElement('div');
+    winnerMsg.classList = 'winnerMsg';
+    winnerMsg.innerText = `${winner} won!`;
+    let againButton = document.createElement('button');
+    againButton.classList = 'again-button'
+    againButton.innerText = 'Play again'
+    gameContainer.appendChild(winnerMsg);
+    gameContainer.appendChild(againButton);
+    againButton.addEventListener('click', () => {
+        gameContainer.remove();
+        createPregameScreen();
+    })
 }
