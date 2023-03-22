@@ -1,4 +1,4 @@
-import './styles.css'
+// import './styles.css'
 
 const boardWidth = 10;
 const container = document.querySelector('.container');
@@ -77,9 +77,7 @@ const startShipsPlacement = () => {
     }))
 
     fields.forEach(field => field.addEventListener('dragleave', (e) => {
-        setTimeout(() => {
             findAndMark(e, fields)
-        }, 100);
     }))
     
     fields.forEach(field => field.addEventListener('drop', (e) => {
